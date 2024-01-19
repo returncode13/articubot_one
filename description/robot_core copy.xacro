@@ -44,31 +44,31 @@
 
     <!-- BASE LINK -->
 
-    <link name="base_link">
+    <link name="${robot_namespace}/base_link">
 
     </link>
 
     <!-- BASE_FOOTPRINT LINK -->
 
-    <joint name="base_footprint_joint" type="fixed">
-        <parent link="base_link"/>
-        <child link="base_footprint"/>
+    <joint name="${robot_namespace}/base_footprint_joint" type="fixed">
+        <parent link="${robot_namespace}/base_link"/>
+        <child link="${robot_namespace}/base_footprint"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
     </joint>
 
-    <link name="base_footprint">
+    <link name="${robot_namespace}/base_footprint">
     </link>
 
 
     <!-- CHASSIS LINK -->
 
-    <joint name="chassis_joint" type="fixed">
-        <parent link="base_link"/>
-        <child link="chassis"/>
+    <joint name="${robot_namespace}/chassis_joint" type="fixed">
+        <parent link="${robot_namespace}/base_link"/>
+        <child link="${robot_namespace}/chassis"/>
         <origin xyz="${-wheel_offset_x} 0 ${-wheel_offset_z}"/>
     </joint>
 
-    <link name="chassis">
+    <link name="${robot_namespace}/chassis">
         <visual>
             <origin xyz="${chassis_length/2} 0 ${chassis_height/2}"/>
             <geometry>
@@ -87,20 +87,20 @@
         </xacro:inertial_box>
     </link>
 
-    <gazebo reference="chassis">
+    <gazebo reference="${robot_namespace}/chassis">
         <material>Gazebo/Orange</material>
     </gazebo>
 
     <!-- LEFT WHEEL LINK -->
 
-    <joint name="left_wheel_joint" type="continuous">
-        <parent link="base_link"/>
-        <child link="left_wheel"/>
+    <joint name="${robot_namespace}/left_wheel_joint" type="continuous">
+        <parent link="${robot_namespace}/base_link"/>
+        <child link="${robot_namespace}/left_wheel"/>
         <origin xyz="0 ${wheel_offset_y} 0" rpy="-${pi/2} 0 0" />
         <axis xyz="0 0 1"/>
     </joint>
 
-    <link name="left_wheel">
+    <link name="${robot_namespace}/left_wheel">
         <visual>
             <geometry>
                 <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
@@ -117,7 +117,7 @@
         </xacro:inertial_cylinder>
     </link>
 
-    <gazebo reference="left_wheel">
+    <gazebo reference="${robot_namespace}/left_wheel">
         <material>Gazebo/Blue</material>
     </gazebo>
 
@@ -126,14 +126,14 @@
 
     <!-- RIGHT WHEEL LINK -->
 
-    <joint name="right_wheel_joint" type="continuous">
-        <parent link="base_link"/>
-        <child link="right_wheel"/>
+    <joint name="${robot_namespace}/right_wheel_joint" type="continuous">
+        <parent link="${robot_namespace}/base_link"/>
+        <child link="${robot_namespace}/right_wheel"/>
         <origin xyz="0 ${-wheel_offset_y} 0" rpy="${pi/2} 0 0" />
         <axis xyz="0 0 -1"/>
     </joint>
 
-    <link name="right_wheel">
+    <link name="${robot_namespace}/right_wheel">
         <visual>
             <geometry>
                 <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
@@ -150,21 +150,21 @@
         </xacro:inertial_cylinder>
     </link>
 
-    <gazebo reference="right_wheel">
+    <gazebo reference="${robot_namespace}/right_wheel">
         <material>Gazebo/Blue</material>
     </gazebo>
 
 
     <!-- CASTER WHEEL LINK -->
 
-    <joint name="caster_wheel_joint" type="fixed">
-        <parent link="chassis"/>
-        <child link="caster_wheel"/>
+    <joint name="${robot_namespace}/caster_wheel_joint" type="fixed">
+        <parent link="${robot_namespace}/chassis"/>
+        <child link="${robot_namespace}/caster_wheel"/>
         <origin xyz="${caster_wheel_offset_x} 0 ${caster_wheel_offset_z}"/>
     </joint>
 
 
-    <link name="caster_wheel">
+    <link name="${robot_namespace}/caster_wheel">
         <visual>
             <geometry>
                 <sphere radius="${caster_wheel_radius}"/>
@@ -181,7 +181,7 @@
         </xacro:inertial_sphere>
     </link>
 
-    <gazebo reference="caster_wheel">
+    <gazebo reference="${robot_namespace}/caster_wheel">
         <material>Gazebo/White</material>
         <mu1 value="0.001"/>
         <mu2 value="0.001"/>

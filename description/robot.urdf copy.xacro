@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro"  name="robot">
 
-    <xacro:arg name="robot_ns" default="eigen0"/>
+    <xacro:arg name="robot_ns" default=""/>
     <xacro:property name="robot_namespace" value="$(arg robot_ns)"/>
 
     <xacro:arg name="use_ros2_control" default="true"/>

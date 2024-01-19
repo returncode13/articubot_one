@@ -45,7 +45,6 @@ def generate_launch_description():
           {'use_sim_time': use_sim_time}
         ],
         package='slam_toolbox',
-        namespace='ns_eigen1',
         executable='async_slam_toolbox_node',
         name='slam_toolbox',
         output='screen')
