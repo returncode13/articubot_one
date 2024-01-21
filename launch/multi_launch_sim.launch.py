@@ -23,7 +23,7 @@ def generate_launch_description():
 
 
 
-    namespace=""
+    namespace="ns_eigen1"
     rsp = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
                     get_package_share_directory(package_name),'launch','rsp.launch.py'
