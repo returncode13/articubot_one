@@ -1,6 +1,6 @@
 slam_toolbox:
   ros__parameters:
-
+    use_sim_time: true
     # Plugin params
     solver_plugin: solver_plugins::CeresSolver
     ceres_linear_solver: SPARSE_NORMAL_CHOLESKY
@@ -9,12 +9,19 @@ slam_toolbox:
     ceres_dogleg_type: TRADITIONAL_DOGLEG
     ceres_loss_function: None
 
+    # # ROS Parameters
+    # odom_frame: ns_eigen_0/odom
+    # map_frame: ns_eigen_0/map
+    # base_frame: ns_eigen_0/base_footprint
+    # scan_topic: /ns_eigen_0/scan
+    # mode: mapping  #localization
+
     # ROS Parameters
-    odom_frame: odom
-    map_frame: map
-    base_frame: base_footprint
+    odom_frame: <robot_namespace>/odom
+    map_frame: <robot_namespace>/map
+    base_frame: <robot_namespace>/base_footprint
     scan_topic: scan
-    mode: mapping
+    mode: mapping  #localization
 
     # if you'd like to immediately start continuing a map at a given pose
     # or at the dock, but they are mutually exclusive, if pose is given
@@ -71,3 +78,6 @@ slam_toolbox:
     minimum_angle_penalty: 0.9
     minimum_distance_penalty: 0.5
     use_response_expansion: true
+
+
+

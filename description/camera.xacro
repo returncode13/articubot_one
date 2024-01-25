@@ -54,6 +54,10 @@
                 </clip>
             </camera>
             <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+                <ros>
+                    <namespace>${robot_namespace}</namespace>
+                    <!-- <remapping>~/out:=laserscan</remapping> -->
+                </ros>
                 <frame_name>camera_link_optical</frame_name>
             </plugin>
         </sensor>

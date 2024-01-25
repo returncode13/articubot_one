@@ -16,6 +16,7 @@ import xacro
 launch_args=[
         DeclareLaunchArgument('use_sim_time',default_value='false',description='Use sim time if true'),
         DeclareLaunchArgument('use_ros2_control',default_value='true',description='Use ros2_control if true'),
+        DeclareLaunchArgument('namespace',default_value='/',description='Use ros2_control if true'),
         ]
 
 def launch_setup(context):
@@ -25,23 +26,25 @@ def launch_setup(context):
         
         namespace=LaunchConfiguration('namespace').perform(context)  #this gets the runtime value of the namespace param
 
+        print("RSP: NS: ",namespace)
         # Process the URDF file
         pkg_path = os.path.join(get_package_share_directory('articubot_two'))
         xacro_file = os.path.join(pkg_path,'description','robot.urdf.xacro')
         # robot_description_config = xacro.process_file(xacro_file).toxml()
-        robot_description_config = Command(['xacro ', xacro_file, ' use_ros2_control:=', use_ros2_control, ' sim_mode:=', use_sim_time])
-        remappings = [('/tf', 'tf'), ('/tf_static', 'tf_static')]
+        robot_description_config = Command(['xacro ', xacro_file, ' use_ros2_control:=', use_ros2_control, ' sim_mode:=', use_sim_time, ' robot_ns:=',namespace])
+        remappings = [('/tf','tf'), ('/tf_static', 'tf_static')]
 
         print("NAMESPACE: RSP: ",namespace)
         # Create a robot_state_publisher node
-        # params = {'frame_prefix':namespace+'/','robot_description': robot_description_config, 'use_sim_time': use_sim_time}
-        params = {'robot_description': robot_description_config, 'use_sim_time': use_sim_time}
+        # print("****robot description:" ,robot_description_config.perform(context))
+        params = {'frame_prefix':namespace+'/','robot_description': robot_description_config, 'use_sim_time': use_sim_time}
+        # params = {'robot_description': robot_description_config, 'use_sim_time': use_sim_time}
         node_robot_state_publisher = Node(
             package='robot_state_publisher',
-            namespace=namespace,
+            # namespace=namespace,
             executable='robot_state_publisher',
             output='screen',
-            remappings=remappings,
+            # remappings=remappings,
             parameters=[params]
         )
         return [node_robot_state_publisher]

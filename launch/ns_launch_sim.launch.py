@@ -8,23 +8,45 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 from launch_ros.actions import Node
-from launch.actions import GroupAction
+from launch.actions import GroupAction,TimerAction
 from launch_ros.actions import PushRosNamespace
 
 
-def generate_launch_description():
+
+PACKAGE_NAME="articubot_two"
+
+
+def generate_global_launches(package_name=PACKAGE_NAME): 
+    
+    ld=LaunchDescription()
+    gazebo_params_file = os.path.join(get_package_share_directory(package_name),'config','gazebo_params.yaml')
+    # Include the Gazebo launch file, provided by the gazebo_ros package
+    gazebo = IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([os.path.join(
+                    get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')]),
+                    launch_arguments={'extra_gazebo_args': '--ros-args --params-file ' + gazebo_params_file}.items()
+             )
+    
+    ld.add_action(gazebo)
+    return ld
+    
+
+
+
+def generate_launch_description_for_single(package_name=PACKAGE_NAME,namespace="/"):
 
 
     # Include the robot_state_publisher launch file, provided by our own package. Force sim time to be enabled
     # !!! MAKE SURE YOU SET THE PACKAGE NAME CORRECTLY !!!
-    namespace="ns_eigen2"
-    package_name='articubot_two' #<--- CHANGE ME
+    namespace=namespace
+    package_name=package_name #<--- CHANGE ME
     ld=LaunchDescription()
     actions=[]
+    print("NS_LAUNCH_FILE ",namespace)
     rsp = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
-                    get_package_share_directory(package_name),'launch','rsp.launch.old.py'
-                )]), launch_arguments={'use_sim_time': 'true', 'use_ros2_control': 'true'}.items()
+                    get_package_share_directory(package_name),'launch','rsp.launch.py'
+                )]), launch_arguments={'use_sim_time': 'true', 'use_ros2_control': 'true',"namespace":namespace}.items()
     )
     ld.add_action(rsp)
 
@@ -46,26 +68,26 @@ def generate_launch_description():
 
     ld.add_action(twist_mux)
 
-    gazebo_params_file = os.path.join(get_package_share_directory(package_name),'config','gazebo_params.yaml')
+    # gazebo_params_file = os.path.join(get_package_share_directory(package_name),'config','gazebo_params.yaml')
 
-    # Include the Gazebo launch file, provided by the gazebo_ros package
-    gazebo = IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([os.path.join(
-                    get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')]),
-                    launch_arguments={'extra_gazebo_args': '--ros-args --params-file ' + gazebo_params_file}.items()
-             )
+    # # Include the Gazebo launch file, provided by the gazebo_ros package
+    # gazebo = IncludeLaunchDescription(
+    #             PythonLaunchDescriptionSource([os.path.join(
+    #                 get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')]),
+    #                 launch_arguments={'extra_gazebo_args': '--ros-args --params-file ' + gazebo_params_file}.items()
+    #          )
 
     # Run the spawner node from the gazebo_ros package. The entity name doesn't really matter if you only have a single robot.
     spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
                         arguments=['-topic', 'robot_description',
-                                   '-entity', 'my_bot'],
+                                   '-entity', namespace],
                         output='screen')
 
 
     diff_drive_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["-c","/"+namespace+"/controller_manager","--namespace",namespace,"diff_cont"],
+        arguments=["-c","/"+namespace+"/controller_manager","--namespace",namespace,"diff_cont",],
     )
 
     joint_broad_spawner = Node(
@@ -74,10 +96,50 @@ def generate_launch_description():
         arguments=["-c","/"+namespace+"/controller_manager","--namespace",namespace,"joint_broad"],
     )
 
-    ld.add_action(gazebo)
-    ld.add_action(spawn_entity)
-    ld.add_action(diff_drive_spawner)
-    ld.add_action(joint_broad_spawner)
+
+    ##SLAM for this bot
+    slam_params_file='/app/ros2_ws/src/articubot_two/config/mapper_params_online_async.yaml'
+    slam_async=IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([os.path.join(
+                    get_package_share_directory(package_name),'launch','slam.launch.py'
+                )]), launch_arguments={'use_sim_time': 'true',
+                                       'namespace':namespace,
+                                       'autostart': 'true',
+                                       'use_respawn': 'true',
+                                       'params_file':slam_params_file
+                                       }.items()
+    )
+    
+    nav2_params_file='/app/ros2_ws/src/articubot_two/config/nav2_params.yaml'
+    nav2=IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([os.path.join(
+                    get_package_share_directory(package_name),'launch','nav2.launch.py'
+                )]), launch_arguments={
+                    'use_sim_time': 'true',
+                    'namespace ': namespace,
+                    'autostart': 'true',
+                    'params_file':nav2_params_file
+                    }.items()
+    )
+
+    timed_slam=TimerAction(
+        period=3.0,
+        actions=[slam_async]
+    )
+
+    timed_nav2=TimerAction(
+        period=6.0,
+        actions=[nav2]
+    )
+
+    timerAction=TimerAction(
+        period=3.0,
+        actions=[]
+    )
+    # ld.add_action(gazebo)
+    # ld.add_action(spawn_entity)
+    # ld.add_action(diff_drive_spawner)
+    # ld.add_action(joint_broad_spawner)
 
     # Code for delaying a node (I haven't tested how effective it is)
     # 
@@ -95,7 +157,7 @@ def generate_launch_description():
     #
     # Replace the diff_drive_spawner in the final return with delayed_diff_drive_spawner
 
-    ld.add_action(PushRosNamespace("ns_eigen2"))
+    # ld.add_action(PushRosNamespace("ns_eigen2"))
 
     # Launch them all!
     # return LaunchDescription([
@@ -107,22 +169,40 @@ def generate_launch_description():
     #     diff_drive_spawner,
     #     joint_broad_spawner
     # ])
-    actions=[
-        PushRosNamespace('ns_eigen2'),
+    ns_actions=[
+        PushRosNamespace(namespace),
         rsp,
         joystick,
         twist_mux,
         
         spawn_entity,
         diff_drive_spawner,
-        joint_broad_spawner
+        joint_broad_spawner,
+        timerAction,
+        # slam_async
+        # # nav2
+        # timed_slam,
+        # timed_nav2
     ]
     
     ld_ns=GroupAction(
-        actions=actions
+        actions=ns_actions
     )
 
     lld=LaunchDescription()
-    lld.add_action(gazebo)
+    # lld.add_action(gazebo)
     lld.add_action(ld_ns)
     return lld
+
+
+def generate_launch_description():
+    
+    ld=LaunchDescription()
+    ld.add_action(generate_global_launches())
+
+    for x in range(0,1):
+        ns="ns_eigen_"+str(x)
+        # ns=""
+        ld.add_action((generate_launch_description_for_single(namespace=ns)))
+    
+    return ld
