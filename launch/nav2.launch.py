@@ -8,7 +8,7 @@ from launch.actions import DeclareLaunchArgument,OpaqueFunction
 from launch_ros.actions import Node
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from nav2_common.launch import RewrittenYaml
+from nav2_common.launch import RewrittenYaml,ReplaceString
 
 
 import xacro
@@ -16,12 +16,13 @@ import xacro
 #I need to get the namespace out when this launch file is called during runtime.
     #https://robotics.stackexchange.com/questions/104340/getting-the-value-of-launchargument-inside-python-launch-file
 
+PACKAGE_NAME="articubot_two"
 
 launch_args=[
         DeclareLaunchArgument('use_sim_time',default_value='true',description='Use sim time if true'),
         # DeclareLaunchArgument('use_ros2_control',default_value='true',description='Use ros2_control if true'),
         DeclareLaunchArgument('namespace',default_value='/',description='Use ros2_control if true'),
-        DeclareLaunchArgument('params_file',default_value='/app/ros2_ws/src/articubot_two/config/nav2_params.yaml',description='param file for nav2'),
+        DeclareLaunchArgument('params_file',default_value='/app/ros2_ws/src/articubot_two/config/nav2_params-2.yaml',description='param file for nav2'),
         DeclareLaunchArgument('autostart',default_value='true',description='param file for nav2')
         ]
 
@@ -40,17 +41,26 @@ def launch_setup(context):
             param_rewrites={},
             convert_types=True
             )
+        
+        namespaced_params_file = ReplaceString(
+             source_file=namespaced_params_file, 
+             replacements={
+                "<robot_namespace>":(namespace)      
+             } 
+        )
+
+
 
         print("NS_PARAMS: ns:",namespace," ns_params_file:", namespaced_params_file," autostart:",autostart)
 
         nav2 = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
-                    get_package_share_directory("nav2_bringup"),'launch','navigation_launch.py'
+                    get_package_share_directory(PACKAGE_NAME),'launch','navigation_launch.py'   #/opt/ros/humble/share/nav2_bringup/launch/navigation_launch.py
                    
                 )]), launch_arguments={'use_sim_time': use_sim_time, 
                                        'params_file': namespaced_params_file,
-                                       'autostart': autostart
-                                    #    "namespace": namespace
+                                       'autostart': autostart,
+                                       "namespace": namespace
                                        }.items()
     )
         return [nav2]

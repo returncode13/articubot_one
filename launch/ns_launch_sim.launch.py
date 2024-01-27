@@ -16,6 +16,8 @@ from launch_ros.actions import PushRosNamespace
 PACKAGE_NAME="articubot_two"
 
 
+x_pos={'del_x':'0.0'}  # a parameter used to spawn robots in different positions along x
+
 def generate_global_launches(package_name=PACKAGE_NAME): 
     
     ld=LaunchDescription()
@@ -80,19 +82,25 @@ def generate_launch_description_for_single(package_name=PACKAGE_NAME,namespace="
     # Run the spawner node from the gazebo_ros package. The entity name doesn't really matter if you only have a single robot.
     spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
                         arguments=['-topic', 'robot_description',
-                                   '-entity', namespace],
+                                   '-entity', namespace,
+                                   '-x', x_pos['del_x'], '-y', '0.0',
+                                    '-z', '0.01', '-Y', '0.0',
+                                   ],
                         output='screen')
 
+    remappings=[("diff_cont/odom","odom")]
+   
 
     diff_drive_spawner = Node(
         package="controller_manager",
-        executable="spawner",
-        arguments=["-c","/"+namespace+"/controller_manager","--namespace",namespace,"diff_cont",],
+        executable="spawner",                 # loads, configures and start a controller on startup.
+        arguments=["-c","/"+namespace+"/controller_manager","--namespace",namespace,"diff_cont"],
+        remappings=remappings
     )
 
     joint_broad_spawner = Node(
         package="controller_manager",
-        executable="spawner",
+        executable="spawner",                 # loads, configures and start a controller on startup.
         arguments=["-c","/"+namespace+"/controller_manager","--namespace",namespace,"joint_broad"],
     )
 
@@ -178,9 +186,9 @@ def generate_launch_description_for_single(package_name=PACKAGE_NAME,namespace="
         spawn_entity,
         diff_drive_spawner,
         joint_broad_spawner,
-        timerAction,
-        # slam_async
-        # # nav2
+        # timerAction,
+        slam_async
+        # nav2
         # timed_slam,
         # timed_nav2
     ]
@@ -199,10 +207,15 @@ def generate_launch_description():
     
     ld=LaunchDescription()
     ld.add_action(generate_global_launches())
+    del_x=0.0
 
     for x in range(0,1):
         ns="ns_eigen_"+str(x)
         # ns=""
         ld.add_action((generate_launch_description_for_single(namespace=ns)))
+
+        #create next robot 1.0 m ahead of the last one.
+        del_x=del_x+1.0
+        x_pos['del_x']=str(del_x)
     
     return ld
