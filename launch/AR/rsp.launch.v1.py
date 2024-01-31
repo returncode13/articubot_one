@@ -12,6 +12,7 @@ import xacro
 #I need to get the namespace out when this launch file is called during runtime.
     #https://robotics.stackexchange.com/questions/104340/getting-the-value-of-launchargument-inside-python-launch-file
 
+PACKAGE_DIR='articubot_two'
 
 launch_args=[
         DeclareLaunchArgument('use_sim_time',default_value='false',description='Use sim time if true'),
@@ -34,20 +35,23 @@ def launch_setup(context):
         robot_description_config = Command(['xacro ', xacro_file, ' use_ros2_control:=', use_ros2_control, ' sim_mode:=', use_sim_time, ' robot_ns:=',namespace])
         remappings = [('/tf','tf'), ('/tf_static', 'tf_static')]
 
-        print("NAMESPACE: RSP: ",namespace)
-        # Create a robot_state_publisher node
-        # print("****robot description:" ,robot_description_config.perform(context))
-        params = {'frame_prefix':namespace+'/','robot_description': robot_description_config, 'use_sim_time': use_sim_time}
-        # params = {'robot_description': robot_description_config, 'use_sim_time': use_sim_time}
-        node_robot_state_publisher = Node(
+        urdf = os.path.join(get_package_share_directory(PACKAGE_DIR), 'description', 'turtlebot3_waffle.xacro')
+        with open(urdf, 'r') as infp:
+            robot_description = infp.read()
+
+        print("RD: ",robot_description)
+        start_robot_state_publisher_cmd = Node(
+            # condition=IfCondition(use_robot_state_pub),
             package='robot_state_publisher',
-            # namespace=namespace,
             executable='robot_state_publisher',
+            name='robot_state_publisher',
+            namespace=namespace,
             output='screen',
-            # remappings=remappings,
-            parameters=[params]
-        )
-        return [node_robot_state_publisher]
+            parameters=[{'use_sim_time': use_sim_time,
+                        'robot_description': robot_description}],
+            remappings=remappings)
+        
+        return [start_robot_state_publisher_cmd]
 
 
 

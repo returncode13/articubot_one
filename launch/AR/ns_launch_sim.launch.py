@@ -50,25 +50,26 @@ def generate_launch_description_for_single(package_name=PACKAGE_NAME,namespace="
                     get_package_share_directory(package_name),'launch','rsp.launch.py'
                 )]), launch_arguments={'use_sim_time': 'true', 'use_ros2_control': 'true',"namespace":namespace}.items()
     )
-    ld.add_action(rsp)
+    # ld.add_action(rsp)
 
     joystick = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
-                    get_package_share_directory(package_name),'launch','joystick.launch.old.py'
-                )]), launch_arguments={'use_sim_time': 'true'}.items()
+                    get_package_share_directory(package_name),'launch','joystick.launch.py'
+                )]), launch_arguments={'use_sim_time': 'true',"namespace":namespace}.items()
     )
 
-    ld.add_action(joystick)
+    # ld.add_action(joystick)
 
     twist_mux_params = os.path.join(get_package_share_directory(package_name),'config','twist_mux.yaml')
     twist_mux = Node(
             package="twist_mux",
             executable="twist_mux",
+            namespace=namespace,
             parameters=[twist_mux_params, {'use_sim_time': True}],
-            remappings=[('/cmd_vel_out','/diff_cont/cmd_vel_unstamped')]
+            remappings=[('cmd_vel_out','diff_cont/cmd_vel_unstamped')]
         )
 
-    ld.add_action(twist_mux)
+    # ld.add_action(twist_mux)
 
     # gazebo_params_file = os.path.join(get_package_share_directory(package_name),'config','gazebo_params.yaml')
 
@@ -81,21 +82,23 @@ def generate_launch_description_for_single(package_name=PACKAGE_NAME,namespace="
 
     # Run the spawner node from the gazebo_ros package. The entity name doesn't really matter if you only have a single robot.
     spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
+                       
                         arguments=['-topic', 'robot_description',
                                    '-entity', namespace,
                                    '-x', x_pos['del_x'], '-y', '0.0',
                                     '-z', '0.01', '-Y', '0.0',
                                    ],
-                        output='screen')
+                        output='screen')            #spawn entity.py starts the controller_manager node
 
-    remappings=[("diff_cont/odom","odom")]
+    remappings=[(namespace+"/diff_cont/odom","odom")]
    
 
     diff_drive_spawner = Node(
         package="controller_manager",
         executable="spawner",                 # loads, configures and start a controller on startup.
-        arguments=["-c","/"+namespace+"/controller_manager","--namespace",namespace,"diff_cont"],
-        remappings=remappings
+        # arguments=["-c","/"+namespace+"/controller_manager","--namespace",namespace,"diff_cont"],
+        # arguments=["-c","/"+namespace+"/controller_manager","--namespace",namespace,"diff_cont"],
+        # remappings=remappings
     )
 
     joint_broad_spawner = Node(
@@ -177,17 +180,18 @@ def generate_launch_description_for_single(package_name=PACKAGE_NAME,namespace="
     #     diff_drive_spawner,
     #     joint_broad_spawner
     # ])
+    
     ns_actions=[
-        PushRosNamespace(namespace),
+        # PushRosNamespace(namespace),
         rsp,
-        joystick,
-        twist_mux,
+        # joystick,
+        # twist_mux,
         
         spawn_entity,
-        diff_drive_spawner,
-        joint_broad_spawner,
-        # timerAction,
-        slam_async
+        # diff_drive_spawner,
+        # joint_broad_spawner,
+        # # timerAction,
+        # slam_async
         # nav2
         # timed_slam,
         # timed_nav2
@@ -199,6 +203,7 @@ def generate_launch_description_for_single(package_name=PACKAGE_NAME,namespace="
 
     lld=LaunchDescription()
     # lld.add_action(gazebo)
+    # lld.add_action(ld)
     lld.add_action(ld_ns)
     return lld
 

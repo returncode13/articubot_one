@@ -1,4 +1,4 @@
-ns_eigen_0/controller_manager:
+controller_manager:
   ros__parameters:
     update_rate: 30
     use_sim_time: true
@@ -9,12 +9,12 @@ ns_eigen_0/controller_manager:
     joint_broad:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-ns_eigen_0/diff_cont:
+diff_cont:
   ros__parameters:
     use_sim_time: true
     publish_rate: 50.0
 
-    base_frame_id: ns_eigen_0/base_link
+    base_frame_id: base_link
 
     left_wheel_names: ['left_wheel_joint']
     right_wheel_names: ['right_wheel_joint']
@@ -30,7 +30,7 @@ ns_eigen_0/diff_cont:
     # left_wheel_radius_multiplier: x
     # right_wheel_radius_multiplier: x
 
-    odom_frame_id: ns_eigen_0/odom
+    odom_frame_id: odom
     # pose_covariance_diagonal: x
     # twist_covariance_diagonal: x
     # open_loop: x
@@ -61,9 +61,9 @@ ns_eigen_0/diff_cont:
     # angular.z.max_jerk: NAN
     # angular.z.min_jerk: NAN
   
-# ns_eigen1:
-#   joint_broad:
-#     ros__parameters:
+joint_broad:
+    ros__parameters:
+      use_local_topics: true
 
 # #########################################################333
 ##############################################################
@@ -84,7 +84,7 @@ ns_eigen_1/diff_cont:
     use_sim_time: true
     publish_rate: 50.0
 
-    base_frame_id:  ns_eigen_1/base_link
+    base_frame_id:  base_link
 
     left_wheel_names: ['left_wheel_joint']
     right_wheel_names: ['right_wheel_joint']
@@ -100,7 +100,7 @@ ns_eigen_1/diff_cont:
     # left_wheel_radius_multiplier: x
     # right_wheel_radius_multiplier: x
 
-    odom_frame_id: ns_eigen_1/odom
+    odom_frame_id: odom
     # pose_covariance_diagonal: x
     # twist_covariance_diagonal: x
     # open_loop: x
@@ -130,7 +130,11 @@ ns_eigen_1/diff_cont:
     # angular.z.min_acceleration: NAN
     # angular.z.max_jerk: NAN
     # angular.z.min_jerk: NAN
-  
+
+
+ns_eigen_1/joint_broad:
+    ros__parameters:
+      use_local_topics: true
 # ns_eigen1:
 #   joint_broad:
 #     ros__parameters:

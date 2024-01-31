@@ -45,18 +45,20 @@ def generate_launch_description_for_single(package_name=PACKAGE_NAME,namespace="
     print("NS_NAV2 LAUNCH_FILE ",namespace)
     
     
-    nav2_params_file='/app/ros2_ws/src/articubot_two/config/nav2_params.yaml'
+    nav2_params_file='/app/ros2_ws/src/articubot_two/config/nav2_iron_all.v1.yaml'
     nav2=IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
                     get_package_share_directory(package_name),'launch','nav2.launch.py'
                 )]), launch_arguments={
                     'use_sim_time': 'true',
                     'namespace': namespace,
+                    'use_namespace': 'True',
                     'autostart': 'true',
                     'params_file':nav2_params_file
                     }.items()
     )
 
+    
    
 
     timed_nav2=TimerAction(
@@ -66,7 +68,7 @@ def generate_launch_description_for_single(package_name=PACKAGE_NAME,namespace="
 
   
     ns_actions=[
-        PushRosNamespace(namespace),
+        # PushRosNamespace(namespace),
         
         nav2
         # timed_slam,

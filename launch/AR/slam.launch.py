@@ -9,7 +9,6 @@ from launch_ros.actions import Node,SetRemap
 from launch.actions import IncludeLaunchDescription,GroupAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from nav2_common.launch import RewrittenYaml,ReplaceString
-from launch_ros.descriptions import ParameterFile
 
 import xacro
 
@@ -62,15 +61,6 @@ def launch_setup(context):
              } 
         )
         
-        
-        # ParameterFile(
-        configured_params = RewrittenYaml(
-            source_file=params_file,
-            root_key=namespace,
-            param_rewrites={},
-            convert_types=True),
-        # allow_substs=True)
-
         lifecycle_nodes = ['map_saver']
         
         remappings=[
@@ -91,7 +81,7 @@ def launch_setup(context):
             respawn=use_respawn,
             respawn_delay=2.0,
             # arguments=['--ros-args', '--log-level', log_level],
-            parameters=[configured_params])
+            parameters=[namespaced_params_file])
 
         start_lifecycle_manager_cmd = Node(
             package='nav2_lifecycle_manager',
@@ -107,7 +97,7 @@ def launch_setup(context):
                 PythonLaunchDescriptionSource([os.path.join(
                     get_package_share_directory("slam_toolbox"),'launch','online_async_launch.py'
                 )]), launch_arguments={'use_sim_time': use_sim_time, 
-                                       'slam_params_file':configured_params
+                                       'slam_params_file':namespaced_params_file
                                     #    "namespace":namespace
                                        }.items()
                 )
@@ -118,8 +108,6 @@ def launch_setup(context):
                         SetRemap(src="/map_metadata", dst="map_metadata"),
                         SetRemap(src="/slam_toolbox/scan_visualization", dst="slam_toolbox/scan_visualization"),
                         SetRemap(src="/slam_toolbox/graph_visualization", dst="slam_toolbox/graph_visualization"),
-                        SetRemap(src="/tf",dst="tf"),
-                        SetRemap(src="/tf_static",dst="tf_static"),
                         
                         
                         slam_online_async
