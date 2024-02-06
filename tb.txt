@@ -1,0 +1,80 @@
+robot1:
+  collision_monitor:
+    ros__parameters:
+      FootprintApproach:
+        action_type: approach
+        footprint_topic: /local_costmap/published_footprint
+        min_points: 6
+        simulation_time_step: 0.1
+        time_before_collision: 2.0
+        type: polygon
+        visualize: false
+      PolygonLimit:
+        action_type: limit
+        angular_limit: 0.5
+        linear_limit: 0.4
+        min_points: 4
+        points:
+        - - 0.5
+          - 0.5
+        - - 0.5
+          - -0.5
+        - - -0.5
+          - -0.5
+        - - -0.5
+          - 0.5
+        polygon_pub_topic: polygon_limit
+        type: polygon
+        visualize: true
+      PolygonSlow:
+        action_type: slowdown
+        min_points: 4
+        points:
+        - - 1.0
+          - 1.0
+        - - 1.0
+          - -1.0
+        - - -0.5
+          - -1.0
+        - - -0.5
+          - 1.0
+        polygon_pub_topic: polygon_slowdown
+        slowdown_ratio: 0.3
+        type: polygon
+        visualize: true
+      PolygonStop:
+        action_type: stop
+        min_points: 4
+        points:
+        - - 0.0
+          - 0.0
+        - - 0.3
+          - -0.3
+        - - 0.0
+          - -0.3
+        - - 0.0
+          - 0.3
+        polygon_pub_topic: polygon_stop
+        type: polygon
+        visualize: true
+      base_frame_id: base_footprint
+      base_shift_correction: true
+      cmd_vel_in_topic: cmd_vel_smoothed
+      cmd_vel_out_topic: cmd_vel
+      observation_sources:
+      - scan
+      odom_frame_id: odom
+      pointcloud:
+        max_height: 0.5
+        min_height: 0.1
+        topic: /intel_realsense_r200_depth/points
+        type: pointcloud
+      polygons:
+      - PolygonStop
+      scan:
+        topic: scan
+        type: scan
+      source_timeout: 5.0
+      state_topic: collision_monitor_state
+      stop_pub_timeout: 2.0
+      transform_tolerance: 0.5

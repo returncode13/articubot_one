@@ -183,6 +183,8 @@ def generate_launch_description():
     with open(urdf, 'r') as infp:
         robot_description = infp.read()
 
+    
+
     start_robot_state_publisher_cmd = Node(
         condition=IfCondition(use_robot_state_pub),
         package='robot_state_publisher',
@@ -225,7 +227,7 @@ def generate_launch_description():
                           'autostart': autostart,
                           'use_composition': use_composition,
                           'use_respawn': use_respawn}.items())
-
+    
     # Create the launch description and populate
     ld = LaunchDescription()
 

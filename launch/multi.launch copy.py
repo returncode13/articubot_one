@@ -26,7 +26,7 @@ from nav2_common.launch import ParseMultiRobotPose
 
 def generate_launch_description():
     """
-    ros2 launch articubot_two multi.launch.py robots:="robot1={x:0.0,y:0.0,z:0.0}"
+    ros2 launch articubot_two multi.launch.py robots:="robot1={x:0.0,y:0.0,z:0.0}'
     Bring up the multi-robots with given launch arguments.
 
     Launch arguments consist of robot name(which is namespace) and pose for initialization.
@@ -144,7 +144,7 @@ def generate_launch_description():
                                   'headless': 'False',
                                   'use_robot_state_pub': use_robot_state_pub,
                                   'use_composition': 'False',
-                                  'slam': 'True',
+                                  'slam': slam,
                                   'x_pose': TextSubstitution(text=str(init_pose['x'])),
                                   'y_pose': TextSubstitution(text=str(init_pose['y'])),
                                   'z_pose': TextSubstitution(text=str(init_pose['z'])),
