@@ -123,7 +123,7 @@ def generate_launch_description():
     declare_rviz_config_file_cmd = DeclareLaunchArgument(
         'rviz_config_file',
         default_value=os.path.join(
-            bringup_dir, 'rviz', 'nav2_default_view.rviz'),
+            package_dir, 'config/rviz', 'nav2_default_view.rviz'),
         description='Full path to the RVIZ config file to use')
 
     declare_use_simulator_cmd = DeclareLaunchArgument(
@@ -227,7 +227,20 @@ def generate_launch_description():
                           'autostart': autostart,
                           'use_composition': use_composition,
                           'use_respawn': use_respawn}.items())
-    
+    # The collision_monitor subscribes to  the cmd_vel_smoothed topic that is published by 
+    # the velocity_smoother node in the bringup launch.
+    # 
+    # The collision_monitor publishes to the cmd_vel topic that is subscribed by multiple
+    # nodes for the robot to move around
+    collision_monitor=IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(package_launch_dir, 'collision_monitor_node.launch.py')),
+        launch_arguments={'namespace': namespace,
+                          'use_sim_time': use_sim_time,
+                          'params_file': params_file,
+                          'use_composition': use_composition,
+                          }.items())
+
     # Create the launch description and populate
     ld = LaunchDescription()
 
@@ -255,10 +268,10 @@ def generate_launch_description():
     ld.add_action(start_gazebo_server_cmd)
     ld.add_action(start_gazebo_client_cmd)
     ld.add_action(start_gazebo_spawner_cmd)
-
+    
     # Add the actions to launch all of the navigation nodes
     ld.add_action(start_robot_state_publisher_cmd)
     ld.add_action(rviz_cmd)
     ld.add_action(bringup_cmd)
-
+    ld.add_action(collision_monitor)
     return ld

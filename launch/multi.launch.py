@@ -31,9 +31,9 @@ def generate_launch_description():
 
     Launch arguments consist of robot name(which is namespace) and pose for initialization.
     Keep general yaml format for pose information.
-    ex) robots:="robot1={x: 1.0, y: 1.0, yaw: 1.5707}; robot2={x: 1.0, y: 1.0, yaw: 1.5707}"
-    ex) robots:="robot3={x: 1.0, y: 1.0, z: 1.0, roll: 0.0, pitch: 1.5707, yaw: 1.5707};
-                 robot4={x: 1.0, y: 1.0, z: 1.0, roll: 0.0, pitch: 1.5707, yaw: 1.5707}"
+    ex) robots:="robot1={x: 1.0, y: 1.0, yaw: 1.5707}; robot2={x: 2.0, y: 2.0, yaw: 1.5707}"
+    ex) robots:="robot3={x: 3.0, y: 1.0, z: 1.0, roll: 0.0, pitch: 1.5707, yaw: 1.5707};
+                 robot4={x: 4.0, y: 1.0, z: 1.0, roll: 0.0, pitch: 1.5707, yaw: 1.5707}"
     """
 
 
@@ -88,7 +88,7 @@ def generate_launch_description():
 
     declare_rviz_config_file_cmd = DeclareLaunchArgument(
         'rviz_config',
-        default_value=os.path.join(bringup_dir, 'rviz', 'nav2_namespaced_view.rviz'),
+        default_value=os.path.join(package_dir, 'config/rviz', 'nav2_namespaced_view.rviz'),
         description='Full path to the RVIZ config file to use.')
 
     declare_use_robot_state_pub_cmd = DeclareLaunchArgument(

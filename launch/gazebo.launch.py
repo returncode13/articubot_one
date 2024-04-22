@@ -57,11 +57,10 @@ def generate_launch_description():
     use_robot_state_pub = LaunchConfiguration('use_robot_state_pub')
     use_rviz = LaunchConfiguration('use_rviz')
     log_settings = LaunchConfiguration('log_settings', default='true')
-
     # Declare the launch arguments
     declare_world_cmd = DeclareLaunchArgument(
         'world',
-        default_value=os.path.join(world_dir, 'obstacles.world'),
+        default_value=os.path.join('/app/ros2_ws/src/aws_worlds/aws-robomaker-small-warehouse-world/worlds/','no_roof_small_warehouse.world'),
         description='Full path to world file to load')
 
     declare_simulator_cmd = DeclareLaunchArgument(
